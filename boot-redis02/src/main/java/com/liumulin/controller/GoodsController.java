@@ -24,17 +24,19 @@ public class GoodsController {
 
     @GetMapping("/buy_goods")
     public String buyGoods() {
-        String res = stringRedisTemplate.opsForValue().get("goods:001");
-        int goodsNum = res == null ? 0 : Integer.parseInt(res);
+        synchronized (this) {
+            String res = stringRedisTemplate.opsForValue().get("goods:001");
+            int goodsNum = res == null ? 0 : Integer.parseInt(res);
 
-        if (goodsNum > 0) {
-            int realGoodsNum = goodsNum - 1;
-            stringRedisTemplate.opsForValue().set("goods:001", String.valueOf(realGoodsNum));
-            System.out.println("你已经成功秒杀商品，此时还剩余：" + realGoodsNum + "件" + "\t 服务器端口: " + serverPort);
-            return "你已经成功秒杀商品，此时还剩余：" + realGoodsNum + "件" + "\t 服务器端口: " + serverPort;
-        } else {
-            System.out.println("商品已经售罄/活动结束/调用超时，欢迎下次光临" + "\t 服务器端口: " + serverPort);
+            if (goodsNum > 0) {
+                int realGoodsNum = goodsNum - 1;
+                stringRedisTemplate.opsForValue().set("goods:001", String.valueOf(realGoodsNum));
+                System.out.println("你已经成功秒杀商品，此时还剩余：" + realGoodsNum + "件" + "\t 服务器端口: " + serverPort);
+                return "你已经成功秒杀商品，此时还剩余：" + realGoodsNum + "件" + "\t 服务器端口: " + serverPort;
+            } else {
+                System.out.println("商品已经售罄/活动结束/调用超时，欢迎下次光临" + "\t 服务器端口: " + serverPort);
+            }
+            return "商品已经售罄/活动结束/调用超时，欢迎下次光临" + "\t 服务器端口: " + serverPort;
         }
-        return "商品已经售罄/活动结束/调用超时，欢迎下次光临" + "\t 服务器端口: " + serverPort;
     }
 }
