@@ -26,9 +26,9 @@ public class GoodsController {
 
     @GetMapping("/buy_goods")
     public String buyGoods() {
+        String value = UUID.randomUUID() + Thread.currentThread().getName();
+        System.out.println("value = " + value);
         try {
-            String value = UUID.randomUUID() + Thread.currentThread().getName();
-            System.out.println("value = " + value);
             Boolean flag = stringRedisTemplate.opsForValue().setIfAbsent(REDIS_LOCK, value);
             if (!flag) {
                 return "抢锁失败";
@@ -47,7 +47,9 @@ public class GoodsController {
             }
             return "商品已经售罄/活动结束/调用超时，欢迎下次光临" + "\t 服务器端口: " + serverPort;
         } finally {
-            stringRedisTemplate.delete("redis_lock");
+            if (value.equalsIgnoreCase(stringRedisTemplate.opsForValue().get(REDIS_LOCK))) {
+                stringRedisTemplate.delete(REDIS_LOCK);
+            }
         }
     }
 }
