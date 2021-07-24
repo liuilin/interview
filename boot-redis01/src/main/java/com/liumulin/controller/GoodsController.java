@@ -1,10 +1,12 @@
 package com.liumulin.controller;
 
+import java.util.UUID;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -16,15 +18,22 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class GoodsController {
 
+    public static final String REDIS_LOCK = "REDIS_LOCK";
     @Value("${server.port}")
     private String serverPort;
-
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
 
     @GetMapping("/buy_goods")
     public String buyGoods() {
-        synchronized (this) {
+        try {
+            String value = UUID.randomUUID() + Thread.currentThread().getName();
+            System.out.println("value = " + value);
+            Boolean flag = stringRedisTemplate.opsForValue().setIfAbsent(REDIS_LOCK, value);
+            if (!flag) {
+                return "抢锁失败";
+            }
+
             String res = stringRedisTemplate.opsForValue().get("goods:001");
             int goodsNum = res == null ? 0 : Integer.parseInt(res);
 
@@ -37,6 +46,8 @@ public class GoodsController {
                 System.out.println("商品已经售罄/活动结束/调用超时，欢迎下次光临" + "\t 服务器端口: " + serverPort);
             }
             return "商品已经售罄/活动结束/调用超时，欢迎下次光临" + "\t 服务器端口: " + serverPort;
+        } finally {
+            stringRedisTemplate.delete("redis_lock");
         }
     }
 }
