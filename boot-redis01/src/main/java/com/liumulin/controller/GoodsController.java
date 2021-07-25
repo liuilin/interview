@@ -1,13 +1,15 @@
 package com.liumulin.controller;
 
+import com.liumulin.utils.RedisUtil;
+import java.time.Duration;
+import java.util.Collections;
 import java.util.UUID;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
+import redis.clients.jedis.Jedis;
 
 /**
  * 商品购买
@@ -25,11 +27,12 @@ public class GoodsController {
     private StringRedisTemplate stringRedisTemplate;
 
     @GetMapping("/buy_goods")
-    public String buyGoods() {
+    public String buyGoods() throws Exception {
         String value = UUID.randomUUID() + Thread.currentThread().getName();
         System.out.println("value = " + value);
         try {
-            Boolean flag = stringRedisTemplate.opsForValue().setIfAbsent(REDIS_LOCK, value);
+//            Boolean flag = stringRedisTemplate.opsForValue().setIfAbsent(REDIS_LOCK, value, 10, TimeUnit.SECONDS);
+            Boolean flag = stringRedisTemplate.opsForValue().setIfAbsent(REDIS_LOCK, value, Duration.ofSeconds(10));
             if (!flag) {
                 return "抢锁失败";
             }
@@ -47,8 +50,48 @@ public class GoodsController {
             }
             return "商品已经售罄/活动结束/调用超时，欢迎下次光临" + "\t 服务器端口: " + serverPort;
         } finally {
-            if (value.equalsIgnoreCase(stringRedisTemplate.opsForValue().get(REDIS_LOCK))) {
-                stringRedisTemplate.delete(REDIS_LOCK);
+//            if (value.equalsIgnoreCase(stringRedisTemplate.opsForValue().get(REDIS_LOCK))) {
+//                stringRedisTemplate.delete(REDIS_LOCK);
+//            }
+            // 上面代码不能保证原子操作
+            // 1.采用 Redis 事务解决
+/*
+            while (true) {
+                // 加事务，乐观锁
+                stringRedisTemplate.watch(REDIS_LOCK);
+                if (value.equalsIgnoreCase(stringRedisTemplate.opsForValue().get(REDIS_LOCK))) {
+                    stringRedisTemplate.setEnableTransactionSupport(true);
+                    stringRedisTemplate.multi();
+                    stringRedisTemplate.delete(REDIS_LOCK);
+                    List<Object> list = stringRedisTemplate.exec();
+                    // 如果为 null，则是删除失败，返回重新执行
+                    if (CollectionUtils.isEmpty(list)) {
+                        continue;
+                    }
+                    // 如果删除成功，释放监视器
+                    stringRedisTemplate.unwatch();
+                    break;
+                }
+            }
+*/
+            // 2.采用官方推荐的 Lua 脚本
+            Jedis jedis = RedisUtil.getJedis();
+            String script = "if redis.call(\"get\",KEYS[1]) == ARGV[1] then\n"
+                    + "    return redis.call(\"del\",KEYS[1])\n"
+                    + "else\n"
+                    + "    return 0\n"
+                    + "end";
+            try {
+                Object res = jedis.eval(script, Collections.singletonList(REDIS_LOCK), Collections.singletonList(value));
+                if ("1".equals(res.toString())) {
+                    System.out.println("---delete REDIS_LOCK success");
+                } else {
+                    System.out.println("---delete REDIS_LOCK error");
+                }
+            } finally {
+                if (null != jedis) {
+                    jedis.close();
+                }
             }
         }
     }
