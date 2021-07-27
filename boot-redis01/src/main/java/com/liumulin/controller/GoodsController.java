@@ -37,12 +37,6 @@ public class GoodsController {
         RLock rLock = redisson.getLock(REDIS_LOCK);
         rLock.lock();
         try {
-//            Boolean flag = stringRedisTemplate.opsForValue().setIfAbsent(REDIS_LOCK, value, 10, TimeUnit.SECONDS);
-            Boolean flag = stringRedisTemplate.opsForValue().setIfAbsent(REDIS_LOCK, value, Duration.ofSeconds(10));
-            if (!flag) {
-                return "抢锁失败";
-            }
-
             String res = stringRedisTemplate.opsForValue().get("goods:001");
             int goodsNum = res == null ? 0 : Integer.parseInt(res);
 
@@ -67,6 +61,9 @@ public class GoodsController {
         String value = UUID.randomUUID() + Thread.currentThread().getName();
         System.out.println("value = " + value);
         try {
+            //Boolean flag = stringRedisTemplate.opsForValue().setIfAbsent(REDIS_LOCK, value);
+            //stringRedisTemplate.expire(REDIS_LOCK, Duration.ofSeconds(10));
+
 //            Boolean flag = stringRedisTemplate.opsForValue().setIfAbsent(REDIS_LOCK, value, 10, TimeUnit.SECONDS);
             Boolean flag = stringRedisTemplate.opsForValue().setIfAbsent(REDIS_LOCK, value, Duration.ofSeconds(10));
             if (!flag) {
