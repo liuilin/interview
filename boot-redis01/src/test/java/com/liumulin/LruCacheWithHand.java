@@ -27,8 +27,6 @@ public class LruCacheWithHand {
     public static void main(String[] args) {
         LruCacheWithHand lruCache = new LruCacheWithHand(3);
         lruCache.put(1, 11);
-        int i = lruCache.get(1);
-
         lruCache.put(2, 22);
         lruCache.put(3, 33);
         System.out.println(lruCache.map.keySet());
