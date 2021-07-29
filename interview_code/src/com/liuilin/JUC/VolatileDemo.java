@@ -3,7 +3,13 @@ package com.liuilin.JUC;
 import java.util.concurrent.TimeUnit;
 
 /**
- * volatile 可见性验证
+ * 1. 验证 volatile 可见性
+ *  1.1 假如 int number = 0; number 变量之前根本没有添加 volatile 关键字修饰，没有可见性
+ *  1.2 加入 volatile 后可以解决可见性问题
+ *
+ * 2. 验证 volatile 不保证原子性
+ *  2.1原子性指的是什么意思？
+ *  不可分割，完整性，也即某个线程正在做某个具体业务时，中间不可以被加塞或分割。需要整体完整。要么同时成功，要么同时失败。
  *
  * @author liuqiang
  * @since 2021-07-29
@@ -11,6 +17,25 @@ import java.util.concurrent.TimeUnit;
 public class VolatileDemo {
 
     public static void main(String[] args) {
+        Goods goods = new Goods();
+        for (int i = 1; i <= 20; i++) {
+            new Thread(() -> {
+                for (int j = 1; j <= 1000; j++) {
+                    goods.addPlusPlus();
+                }
+            }, String.valueOf(i)).start();
+        }
+
+        // 需要等待前面的所有线程都计算完成后再走后面的 main 线程（为什么是大于 2？因为后台默认有两个线程：1. main 线程；2 GC 线程）
+        while (Thread.activeCount() > 2) {
+            Thread.yield(); // 挂起不执行此线程
+        }
+
+        System.out.println(Thread.currentThread().getName() + "final num value --- " + goods.num);
+    }
+
+    // volatile 可以保证可见性，及时通知其它线程，主物理内存的值已经被修改。
+    private static void visualByVolatile() {
         Goods goods = new Goods();
         new Thread(() -> {
             System.out.println(Thread.currentThread().getName() + " --- come in");
@@ -36,5 +61,10 @@ class Goods {
 
     public void buyGoods() {
         this.num = this.num - 1;
+    }
+
+    // 注意此时 number 前面是加了 volatile 关键字修饰的，所以说 volatile 不保证原子性
+    public void addPlusPlus() {
+        num++;
     }
 }
