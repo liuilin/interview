@@ -3,7 +3,7 @@ package com.liuilin.JUC;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Volatile 可见性验证
+ * volatile 可见性验证
  *
  * @author liuqiang
  * @since 2021-07-29
