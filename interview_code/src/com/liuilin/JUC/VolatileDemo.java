@@ -1,6 +1,7 @@
 package com.liuilin.JUC;
 
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * 1. 验证 volatile 可见性
@@ -8,8 +9,13 @@ import java.util.concurrent.TimeUnit;
  *  1.2 加入 volatile 后可以解决可见性问题
  *
  * 2. 验证 volatile 不保证原子性
- *  2.1原子性指的是什么意思？
+ *  2.1 原子性指的是什么意思？
  *  不可分割，完整性，也即某个线程正在做某个具体业务时，中间不可以被加塞或分割。需要整体完整。要么同时成功，要么同时失败。
+ *  2.2 volatile 不保证原子性案例
+ *  2.3 why
+ *  2.4 如何解决原子性
+ *      - 加 Synchronized
+ *      - 使用 JUC 下面的 AtomicInteger
  *
  * @author liuqiang
  * @since 2021-07-29
@@ -58,6 +64,7 @@ class Goods {
 
     // int num = 10;
     volatile int num = 10; // 用 volatile 保证数据可见性，没加 volatile 会导致 main 线程一直等待不结束
+    AtomicInteger atomicInteger = new AtomicInteger();
 
     public void buyGoods() {
         this.num = this.num - 1;
@@ -67,4 +74,9 @@ class Goods {
     public void addPlusPlus() {
         num++;
     }
+
+    public void addMyAtomic() {
+        atomicInteger.getAndIncrement();
+    }
+
 }
