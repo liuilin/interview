@@ -28,6 +28,7 @@ public class VolatileDemo {
             new Thread(() -> {
                 for (int j = 1; j <= 1000; j++) {
                     goods.addPlusPlus();
+                    goods.addMyAtomic();
                 }
             }, String.valueOf(i)).start();
         }
@@ -37,7 +38,8 @@ public class VolatileDemo {
             Thread.yield(); // 挂起不执行此线程
         }
 
-        System.out.println(Thread.currentThread().getName() + "final num value --- " + goods.num);
+        System.out.println(Thread.currentThread().getName() + " --- int final num value --- " + goods.num);
+        System.out.println(Thread.currentThread().getName() + " --- AtomicInteger final num value --- " + goods.atomicInteger);
     }
 
     // volatile 可以保证可见性，及时通知其它线程，主物理内存的值已经被修改。
@@ -57,7 +59,6 @@ public class VolatileDemo {
         }
         System.out.println(Thread.currentThread().getName() + " --- mission complete.");
     }
-
 }
 
 class Goods {
