@@ -32,7 +32,7 @@ public class ProdConsumer {
         new Thread(() -> {
             for (int i = 1; i <= 5; i++) {
                 try {
-                    data.decrecement();
+                    data.decrement();
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -68,7 +68,7 @@ class ShareData {
         }
     }
 
-    public void decrecement() throws InterruptedException {
+    public void decrement() throws InterruptedException {
         lock.lock();
         try {
             // 判断

@@ -14,10 +14,8 @@ public class HowToCreateThread {
 
     public static void main(String[] args) {
         new MyThread().start();
-
-        new Thread(new MyRunnable()).start();
-
-        new Thread(new FutureTask<>(new MyCall())).start();
+        new Thread(new MyRunnable(), "Runnable").start();
+        new Thread(new FutureTask<>(new MyCallable()), "Callable").start();
 
         ExecutorService service = Executors.newCachedThreadPool();
         service.execute(() -> {
@@ -27,14 +25,14 @@ public class HowToCreateThread {
 
         new Thread(() -> {
             System.out.println(Thread.currentThread().getName() + " thread running...");
-        }, "T1").start();
+        }, "RunnableWithLambda").start();
     }
 
     static class MyThread extends Thread {
 
         @Override
         public void run() {
-            System.out.println("Hello MyThread!");
+            System.out.println(Thread.currentThread().getName());
         }
 
     }
@@ -43,16 +41,16 @@ public class HowToCreateThread {
 
         @Override
         public void run() {
-            System.out.println("Hello MyRunnable!");
+            System.out.println(Thread.currentThread().getName());
         }
     }
 
-    static class MyCall implements Callable<String> {
+    static class MyCallable implements Callable<Integer> {
 
         @Override
-        public String call() throws Exception {
-            System.out.println("Hello MyCallable!");
-            return "success";
+        public Integer call() throws Exception {
+            System.out.println(Thread.currentThread().getName());
+            return 1;
         }
     }
 }
