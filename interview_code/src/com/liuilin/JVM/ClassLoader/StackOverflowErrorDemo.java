@@ -8,7 +8,7 @@ package com.liuilin.JVM.ClassLoader;
  * @author liuqiang
  * @since 2021-08-04
  */
-public class TestString {
+public class StackOverflowErrorDemo {
 
     // java.lang.StackOverflowError
     // 默认情况下 i = 9879
