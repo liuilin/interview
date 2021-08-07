@@ -11,24 +11,25 @@ public class Resource {
 
     public static void main(String[] args) {
         Resource resource = new Resource();
-        for (int i = 1; i <= 2; i++) {
-            new Thread(() -> {
-                resource.method1();
-                resource.method2();
-            }, String.valueOf(i)).start();
-        }
+        new Thread(() -> {
+            resource.method1();
+        }, "T1").start();
+
+        new Thread(() -> {
+            resource.method2();
+        }, "T2").start();
     }
 
     public void method1() {
-        a = 1;              // 语句 1
         flag = true;        // 语句 2
+        a = 1;              // 语句 1
     }
 
-    // 多线程环境中线程交替执行，由于编译器优化重排的存在，两个线程使用的变量能否保持一致性是无法确定的，以至于结果无法预测
+    // 多线程环境中线程交替执行，由于编译器优化重排的存在，两个线程使用的变量（flag 和 a）无法保持一致，导致结果也不同
     public void method2() {
         if (flag) {
             a = a + 5;      // 语句 3
-            System.out.println(Thread.currentThread().getName() + "--- return value --- " + a);
+            System.out.println(Thread.currentThread().getName() + " --- return value --- " + a);
         }
     }
 }

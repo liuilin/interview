@@ -23,6 +23,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class VolatileDemo {
 
     public static void main(String[] args) {
+        // visualByVolatile();
         Goods goods = new Goods();
         for (int i = 1; i <= 20; i++) {
             new Thread(() -> {
