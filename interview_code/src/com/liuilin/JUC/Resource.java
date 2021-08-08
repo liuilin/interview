@@ -11,13 +11,9 @@ public class Resource {
 
     public static void main(String[] args) {
         Resource resource = new Resource();
-        new Thread(() -> {
-            resource.method1();
-        }, "T1").start();
+        new Thread(resource::method1, "T1").start();
 
-        new Thread(() -> {
-            resource.method2();
-        }, "T2").start();
+        new Thread(resource::method2, "T2").start();
     }
 
     public void method1() {
