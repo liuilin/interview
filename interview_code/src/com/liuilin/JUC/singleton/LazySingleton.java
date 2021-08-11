@@ -1,4 +1,4 @@
-package com.liuilin.JUC;
+package com.liuilin.JUC.singleton;
 
 /**
  * 懒汉模式
