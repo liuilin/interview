@@ -31,31 +31,31 @@ public class ReadWriteLockDemo {
         }
     }
     // =========================== before print out ===========================
-    // 1 线程正在写入...
-    // 2 线程正在写入...
-    // 3 线程正在写入...
+    // 2 线程正在写入值：2
+    // 3 线程正在写入值：3
+    // 1 线程正在写入值：1
     // 1 线程正在读取...
-    // 2 线程正在读取...
     // 3 线程正在读取...
-    // 1 线程写入完成
+    // 2 线程正在读取...
     // 2 线程读取完成，值为：null
     // 2 线程写入完成
-    // 3 线程读取完成，值为：null
-    // 1 线程读取完成，值为：null
+    // 1 线程读取完成，值为：1
+    // 3 线程读取完成，值为：3
+    // 1 线程写入完成
     // 3 线程写入完成
     // =========================== after print out ===========================
-    // 2 线程正在写入...
-    // 2 线程写入完成
-    // 1 线程正在写入...
-    // 1 线程写入完成
-    // 3 线程正在写入...
+    // 3 线程正在写入值：3
     // 3 线程写入完成
-    // 1 线程正在读取...
+    // 1 线程正在写入值：1
+    // 1 线程写入完成
+    // 2 线程正在写入值：2
+    // 2 线程写入完成
     // 2 线程正在读取...
     // 3 线程正在读取...
+    // 1 线程正在读取...
+    // 3 线程读取完成，值为：3
     // 1 线程读取完成，值为：1
     // 2 线程读取完成，值为：2
-    // 3 线程读取完成，值为：3
 
 }
 class Cache{
@@ -66,7 +66,7 @@ class Cache{
     public void put(String key,Object value){
         rwLock.writeLock().lock();
         try {
-            System.out.println(Thread.currentThread().getName() + " 线程正在写入...");
+            System.out.println(Thread.currentThread().getName() + " 线程正在写入值：" + key);
             // 暂停一会儿线程
             try { TimeUnit.MICROSECONDS.sleep(300); } catch (InterruptedException e) { e.printStackTrace(); }
             map.put(key, value);
@@ -74,7 +74,6 @@ class Cache{
         } finally {
             rwLock.writeLock().unlock();
         }
-
     }
 
     public void get(String key){
@@ -88,7 +87,9 @@ class Cache{
         } finally {
             rwLock.readLock().unlock();
         }
-
     }
 
+    public void clearMap(){
+        map.clear();
+    }
 }
