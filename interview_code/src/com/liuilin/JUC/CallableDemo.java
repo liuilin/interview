@@ -21,13 +21,17 @@ public class CallableDemo {
 //        Integer res2 = (Integer) futureTask.get(); // 阻塞，等待线程执行完才走 res1 打印
 
         Integer res1 = 100;
-//        while (!futureTask.isDone()) {
-//        }
+//        while (!futureTask.isDone()) { }
         System.out.println("先执行 futureTask，结果为：" + res1);
         // 要求获得 Callable 线程的计算结果，如果没有计算完成就要去抢，会导致阻塞，得把值结算完成
         Integer res2 = (Integer) futureTask.get(); // 不会阻塞，先打印 res1，再计算结果并等待线程返回
         System.out.println(res1 + res2);
     }
+    // ================================ print out ================================
+    // 先执行 futureTask，结果为：100
+    // FutureTask running...
+    // FutureTask running...
+    // 1100
 
 }
 

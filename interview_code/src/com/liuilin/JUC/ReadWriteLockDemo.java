@@ -35,13 +35,13 @@ public class ReadWriteLockDemo {
     // 3 线程正在写入值：3
     // 1 线程正在写入值：1
     // 1 线程正在读取...
-    // 3 线程正在读取...
     // 2 线程正在读取...
+    // 3 线程正在读取...
+    // 1 线程读取完成，值为：null
     // 2 线程读取完成，值为：null
-    // 2 线程写入完成
-    // 1 线程读取完成，值为：1
-    // 3 线程读取完成，值为：3
+    // 3 线程读取完成，值为：null
     // 1 线程写入完成
+    // 2 线程写入完成
     // 3 线程写入完成
     // =========================== after print out ===========================
     // 3 线程正在写入值：3
@@ -68,7 +68,7 @@ class Cache{
         try {
             System.out.println(Thread.currentThread().getName() + " 线程正在写入值：" + key);
             // 暂停一会儿线程
-            try { TimeUnit.MICROSECONDS.sleep(300); } catch (InterruptedException e) { e.printStackTrace(); }
+            try { TimeUnit.MILLISECONDS.sleep(500); } catch (InterruptedException e) { e.printStackTrace(); }
             map.put(key, value);
             System.out.println(Thread.currentThread().getName() + " 线程写入完成");
         } finally {
@@ -81,7 +81,7 @@ class Cache{
         try {
             System.out.println(Thread.currentThread().getName() + " 线程正在读取...");
             // 暂停一会儿线程
-            try { TimeUnit.MICROSECONDS.sleep(300); } catch (InterruptedException e) { e.printStackTrace(); }
+            try { TimeUnit.MILLISECONDS.sleep(300); } catch (InterruptedException e) { e.printStackTrace(); }
             Object res = map.get(key);
             System.out.println(Thread.currentThread().getName() + " 线程读取完成，值为：" + res);
         } finally {
