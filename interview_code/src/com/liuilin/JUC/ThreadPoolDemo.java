@@ -36,7 +36,7 @@ public class ThreadPoolDemo {
     private static void jdkThreadPool() {
         //        ExecutorService threadPool = Executors.newFixedThreadPool(5); // 一池 5 个处理线程（银行 5 个处理业务窗口）
 //        ExecutorService threadPool = Executors.newSingleThreadExecutor(); // 一池 1 个处理线程（只有一个工作人员上班）
-        ExecutorService threadPool = Executors.newCachedThreadPool(); // 一池 N 线程，随机扩容多线程
+        ExecutorService threadPool = Executors.newCachedThreadPool(); // 一池 N 线程，随机扩容多线程。
 
         // 池化技术先关池，再操作业务
         try {
