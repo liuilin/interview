@@ -1,7 +1,5 @@
 package com.liumulin.controller;
 
-import java.time.Duration;
-import java.util.UUID;
 import org.redisson.Redisson;
 import org.redisson.api.RLock;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,10 +8,14 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.UUID;
+
 /**
+ * 产品控制器
  * 商品购买
  *
  * @author liuqiang
+ * @date 2022/11/28
  * @since 2021-07-22
  */
 @RestController
@@ -29,6 +31,12 @@ public class GoodsController {
     private Redisson redisson;
 
 
+    /**
+     * 购买商品
+     *
+     * @return {@link String}
+     * @throws Exception 异常
+     */
     @GetMapping("/buy_goods")
     public String buyGoods() throws Exception {
         String value = UUID.randomUUID() + Thread.currentThread().getName();
